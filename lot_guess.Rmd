@@ -1,0 +1,310 @@
+---
+title: "樂透彩預測"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+ 
+ 
+Time: `r Sys.time()`
+ 
+----------------------------------------------
+ 
+  
+
+```{r ,echo=F,warning=F,message=F }
+
+setwd("~/mygit/peterlovejin.github.io/")
+# install.packages("DT")
+  # install.packages("rvest")
+  # install.packages("tidyverse")
+
+
+library("knitr")
+library(DT)
+library(rvest)
+library(dplyr)
+
+#library(RCurl)
+
+  
+bingo=0
+mm=0
+i=1
+ 
+c=NULL
+for (i in 1:59){
+  
+  
+ url=paste("https://www.pilio.idv.tw/lto/list.asp?indexpage=",i,"&orderby=new",sep="") 
+ 
+xx=url %>% read_html()%>% html_nodes("table.auto-style1")%>% html_nodes("tr")%>% html_nodes("td") %>%html_text()
+library(stringr)
+n=length(xx)
+
+ 
+mydate=xx[seq(4,n,3)]
+myn=xx[seq(5,n,3)]%>%str_trim("both")  
+mys=xx[seq(6,n,3)]%>%str_trim("both")
+b=data.frame(mydate,myn,mys)
+
+                                
+c=rbind(c,b)}
+
+ 
+ 
+ 
+
+library(tidyr)
+ 
+c1=c %>% separate(myn,c("v1","v2","v3","v4","v5","v6"))
+ 
+
+ 
+
+library(stringr)
+ 
+c1$mydate=as.character(c$mydate) 
+
+ 
+c1$mydate=as.Date(str_sub(c$mydate,1,10),"%Y/%m/%d")
+ 
+c1$mys=as.character(c1$mys)
+ 
+ 
+
+c11=c1[order(c1$mydate),]
+ 
+write.csv(c11,"lot.csv",row.names=F)
+ 
+ 
+xx1=read.csv("lot.csv") 
+
+# for (i in 2:8) c11[,i]=as.integer(c11[,i])
+ 
+
+
+
+
+
+
+```
+
+
+
+
+### 特別號： 單用以本期開獎獎號下期1+2常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 8,nrow=8)
+
+xx1=unique(xx1)
+n=nrow(xx1)
+
+for (i in 2:n){
+  
+  nextday[as.integer(xx1[i-1,8]),as.integer(xx1[i,8])]=  nextday[as.integer(xx1[i-1,8]),as.integer(xx1[i,8])]+1
+  
+   guess=NULL
+   
+  for (j in 1:1){
+ lst <- sort(as.integer(nextday[as.integer(xx1[i,8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(lst$x,8))$ix[c(2,3,5)]
+
+# tmp2=which.max(as.integer(nextday[as.integer(xx1[i,8])[j],]))
+ 
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,guess)
+ 
+ }
+  
+  guess=unique(guess)
+  guess=sample(guess,1)
+  
+   if (i>200){ result11=c(result11,sum(guess %in%  as.integer(xx1[i+1,8])))}
+
+}
+ 
+table(result11) %>% kable()
+  
+round((table(result11)/sum(table(result11)))*100,2)%>% kable() 
+
+
+
+
+  
+print(paste("最新一期猜測結果：", tail(result11,2)[1]))
+  
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1){
+lst <- sort(as.integer(nextday[as.integer(xx1[i,8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(lst$x,8))$ix [c(2,3,5)]
+ 
+#tmp2=which.max(as.integer(nextday[as.integer(xx1[i,8])[j],]))
+ 
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,guess)
+  }
+
+#print(nextday)
+print("本期開獎：")  
+print(xx1[n,8])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+print(sample(guess,1))
+
+ 
+```
+
+
+
+
+### 六組號： 1+2最常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 38,nrow=38)
+
+xx1=unique(xx1)
+n=nrow(xx1)
+
+for (i in 2:n){
+  
+ 
+  nextday[as.integer(xx1[i-1,2:7]),as.integer(xx1[i,2:7])]=  nextday[as.integer(xx1[i-1,2:7]),as.integer(xx1[i,2:7])]+1
+  
+ 
+ if (i>200){
+  
+  guess=NULL
+  for (j in 1:6){
+ lst <- sort(as.integer(nextday[as.integer(xx1[i,2:7])[j],]), index.return=TRUE, decreasing=TRUE)
+ 
+ 
+tmp=lapply(lst, `[`, lst$x %in% head(lst$x,38))$ix[c(2,3,38)]
+
+
+ #tmp2=which.max(as.integer(nextday[as.integer(xx1[i,2:7])[j],]))
+ 
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,guess)
+ 
+ }
+  
+   guess=sample(guess,6)
+ 
+    result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:7])))}
+}
+
+ 
+  
+  table(result11) %>% kable()
+   round((table(result11)/sum(table(result11)))*100,2)%>% kable()
+   
+   
+   
+   
+  
+  print(paste("最新一期猜測結果：", tail(result11,2)[1]))
+  
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:6){
+ lst <- sort(as.integer(nextday[as.integer(xx1[i,2:7])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(lst$x,38))$ix [c(2,3,38)]
+
+ #tmp2=which.max(as.integer(nextday[as.integer(xx1[i,2:7])[j],]))
+ 
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,guess)}
+ 
+ 
+  
+
+#print(nextday)
+print("本期開獎：")  
+ 
+xx1[n,] %>%data.frame()%>% datatable()
+
+guess=unique(guess)
+
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+print(sample(guess,6))
+ 
+
+```
+
+
+s=matrix()
+
+
+for ( i in 1:38){
+
+print("---")
+print(i)
+print(table(yet[,i]))
+}
+
+s[2,1]=1
+
+s[1]=2
+s[2]=2
+
+nrow(xx1)
+
+table(unlist(xx1[128:137,2:8]))
+
+head(xx1)
+
+matrix(0,dim=c(38,1))
+yet=matrix(0, nrow = 38, ncol = 38)
+
+1:38 %in% c(xx1[1,2:7])
+nrow(xx1)
+
+
+
+for (j in 1:38){
+n=1
+for (i in 1:138){
+
+if (!(j %in% xx1[i,2:7])) yet[j,n]=yet[j,n]+1 else n=n+1
+
+}
+}
+
+barplot(table(yet))
+
+for ( x in 1:38){
+print("------")
+print(x)
+print(table(yet[x,]))
+}
+
+sort(table(unlist(xx1[,2:7])))
+

@@ -1,0 +1,585 @@
+---
+title: "stock_main_source_20210709"
+author: "Peter Lin"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+time: `r Sys.time()`
+
+```{css,echo = FALSE}
+caption {
+      color: red;
+      font-weight: bold;
+      font-size: 2.0em;
+    }
+```
+
+ 
+
+### 當日主力買賣總和
+
+```{r ,echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=6}
+
+library("rmarkdown")
+ 
+
+setwd("/home/peter/mygit/peterlovejin.github.io")
+ 
+#install.packages("kableExtra")
+#install.packages("tidyverse")
+library(knitr)
+library(kableExtra)
+library(DT)
+library(tidyverse)
+library(rvest)
+library(stringr)
+#library(quantmod)
+library(tidyr)
+ 
+#library(devtools)
+ 
+ 
+ 
+ 
+#devtools::install_github("joshuaulrich/quantmod")
+
+full=NULL
+
+ myview=function(x) {url2=paste0("https://goodinfo.tw/StockInfo/DayTrading.asp?STOCK_ID=",x)
+xxx=url2 %>% read_html()
+ttt=xxx %>% html_table()
+return(as.character(ttt[[11]][5,c(1,3,4,5)]))
+}
+ 
+ 
+
+
+  my=c("2390","6180","1570","2727","3679","6207","2841","5410","2929","1570","8112","2363","6226","8936","8941","00715L","6246","1340","2888","1540","6205","2883","1471")
+
+  test=c("5521","2867","2636","2609","1315","2409","3176","2428","2489","5511","2834","9919","2417","3702","1312","1309")
+  
+ my=unique(my)
+
+
+tryCatch( for (i in my){
+wp=NULL
+page=NULL
+wp1=NULL
+wp2=NULL
+stake=NULL
+date=NULL
+tmp=NULL
+
+
+Sys.sleep(1)
+ 
+url=paste0("https://tw.stock.yahoo.com/d/s/major_",i,".html")
+page=url %>% read_html(encoding="BIG5")
+
+wp=page%>%html_nodes("table")%>%html_nodes("td") %>%html_text()
+
+wp1=str_squish(wp)
+wp2=wp1[16:135] 
+stake=str_extract(wp1[1],"[\\w]+")
+
+
+date=str_remove_all(str_extract(wp1[5],"[0-9/ ]+")," ")
+
+date1=paste0(as.integer(str_sub(date,1,3))+1911,str_sub(date,4,9))
+
+holder=stake
+
+#assign(holder,getSymbols(paste0(i,".TW"),auto.assign=F,from="2021-01-01",to=date1))
+
+ 
+
+
+name=wp2[seq(1,120,4)]
+buy=as.integer(wp2[seq(2,120,4)])
+sell=as.integer(wp2[seq(3,120,4)])
+total=as.integer(wp2[seq(4,120,4)])
+#price=as.numeric(myview(i)[4,1])
+tmp=data.frame(stake,date,name,buy,sell,total)
+ 
+ 
+
+full=rbind(tmp,full)
+},warning = function(war){
+  print(paste("MY_WARNING:  ",war)) #如果有warning則輸出warning,"MY_WARNING:  "這一行可以自己改
+},error = function(err) {
+  print(paste("MY_ERROR:  ",err))   #如果有error則輸出error,"MY_Error:  "這一行可以自己改
+}
+# ,finally = {
+#   print(paste("End Try&Catch")) #最後一定要執行的指令或輸出
+# }
+
+)
+
+ 
+ 
+dd=str_replace_all(unique(date),"/","-")
+
+ 
+ 
+
+ write.csv(full,paste0("stack_",dd,".csv"))
+ 
+ 
+
+#full %>% group_by(stake) %>% summarise(t=sum(total))
+
+
+#bb=read.csv("stack_110-07-07.csv") 
+ 
+
+#f2=read.csv("D:/test2/rhandsontable/vignettes/stack_110-07-06.csv")
+ 
+ 
+ 
+#aa=rbind(full,f2[,-1],bb[,-1])
+
+
+ 
+
+na.omit(full) %>% group_by(stake) %>% summarise(t=sum(total)) %>% kable(caption=dd) %>%
+  kable_classic( html_font = "Cambria",c("striped", "hover","condensed"),full_width=F,font_size=20) %>%
+  column_spec(1:2,width="3.5cm")
+
+
+# 
+# 
+# url=paste0("https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=html&date=",tday,"&stockNo=",str_sub(x,1,4))
+# 
+#  
+# 
+# page=read_html(url)
+# 
+#  
+#   
+# p1=page %>% html_table()%>% .[[1]] 
+# 
+#  
+# 
+# p2=p1%>% names()
+# 
+# tt=unique(str_squish(p2))
+# 
+# names(p1)=p1[1,]
+# 
+# p1=p1[-1,]
+# p1$date=as.Date(p1$日期)
+# 
+# p1$p=as.numeric(p1$收盤價)
+# p1$h= as.numeric(p1$最高價)
+# p1$l= as.numeric(p1$最低價)
+# 
+# 
+# print(ggplot(p1)+geom_line(aes(date,h),lty=2,col="blue")+geom_line(aes(date,l),lty=2,col="red")+geom_line(aes(date,p))  +labs(title=tt,y="",x=""))
+# 
+# 
+# p1$price=scale(as.numeric(p1$收盤價))
+# 
+# p1$high=scale(as.numeric(p1$最高價))
+# p1$low=scale(as.numeric(p1$最低價))
+# p1$q=scale(as.numeric(str_remove_all(p1$成交股數,",")))
+# 
+#  
+# print(ggplot(p1)+geom_line(aes(date,high),lty=2,col="blue")+geom_line(aes(date,low),lty=2,col="red")+geom_line(aes(date,price))+geom_bar(aes(date,q),stat="identity",alpha=.3)+geom_hline(yintercept = 0)+labs(title=tt,y="",x=""))
+# 
+#   
+```
+
+
+公開資訊
+--------------------------------------------------------------------- 
+
+ 
+ 
+```{r ,echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=9}
+
+url="https://www.twse.com.tw/exchangeReport/BFT41U?response=html&date=20210726&selectType=ALL"
+
+library(rvest)
+tmp1=read_html(url) %>% html_table() %>% .[[1]]
+topic=names(tmp1)[1]
+names(tmp1)=tmp1[1,]
+tmp1=tmp1[-1,]
+ 
+
+
+```
+
+
+--------------------------------------------------------------------- 
+
+ 
+ 
+```{r ,echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=9}
+
+
+ 
+ 
+
+yes=read.csv("stack_update.csv",encoding = "BIG5")
+
+ 
+
+ 
+library(tidyverse)
+
+ 
+ 
+ 
+
+aa=rbind(full,yes[,-1])
+
+if(!identical(unique(aa$date),unique(yes$date))){write.csv(aa,"stack_update.csv")}
+
+
+aa=na.omit(aa)
+
+
+
+aa %>% group_by(stake,name) %>% summarise(t=sum(total))%>% group_by(stake)%>%arrange(stake,-t)%>% datatable(options = list(autoWidth=T,
+  columnDefs = list(list(width = '100px',className = 'dt-center', targets = '_all'))))
+
+
+
+
+```
+
+
+
+--------------------------------------------------------------------- 
+
+
+### 當日主力top 5買賣分析
+ 
+```{r ,echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=9}
+
+library(lubridate)
+
+# 
+ # 
+# j=unique(full$stake)
+# 
+# 
+# 
+# 
+# 
+# for (x in j){
+#   
+#   print(full %>% filter(total>1 | total<(-1))%>%filter(stake==x) %>%  arrange(total) %>% ggplot()+geom_bar(aes(date,total,fill=ifelse(total>0,"blue","red")),stat="identity")+theme(axis.text.x=element_text(angle = 0,size=8))+geom_hline(yintercept = 0)+facet_wrap(name~.,ncol=5)+labs(title=x) +theme(legend.position = "none")
+# )
+# }
+
+
+
+```
+
+
+---------------------------------------------------------------------
+
+
+
+```{r ,echo=F,warning=F,message=F,error=F,fig.width=10,fig.height=7}
+
+
+
+
+ 
+
+tday=format(Sys.Date(),"%Y%m%d")
+
+full1=na.omit(full) 
+j=unique(full$stake)
+ 
+for (x in j){
+# 
+# 
+# url=paste0("https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=html&date=",tday,"&stockNo=",str_sub(x,1,4))
+# 
+#  
+# 
+# page=read_html(url)
+# 
+#  
+#   
+# p1=page %>% html_table()%>% .[[1]] 
+# 
+#  
+# 
+# p2=p1%>% names()
+# 
+# tt=unique(str_squish(p2))
+# 
+# names(p1)=p1[1,]
+# 
+# p1=p1[-1,]
+# p1$date=as.Date(p1$日期)
+# 
+# p1$p=as.numeric(p1$收盤價)
+# p1$h= as.numeric(p1$最高價)
+# p1$l= as.numeric(p1$最低價)
+# 
+# 
+# print(ggplot(p1)+geom_line(aes(date,h),lty=2,col="blue")+geom_line(aes(date,l),lty=2,col="red")+geom_line(aes(date,p))  +labs(title=tt,y="",x=""))
+# 
+# 
+# p1$price=scale(as.numeric(p1$收盤價))
+# 
+# p1$high=scale(as.numeric(p1$最高價))
+# p1$low=scale(as.numeric(p1$最低價))
+# p1$q=scale(as.numeric(str_remove_all(p1$成交股數,",")))
+# 
+#  
+# print(ggplot(p1)+geom_line(aes(date,high),lty=2,col="blue")+geom_line(aes(date,low),lty=2,col="red")+geom_line(aes(date,price))+geom_bar(aes(date,q),stat="identity",alpha=.3)+geom_hline(yintercept = 0)+labs(title=tt,y="",x=""))
+# 
+#   
+
+ 
+ 
+print(str_extract(x,"[0-9L]+"))  
+
+myprice=NULL 
+ 
+myprice=myview(str_extract(x,"[0-9L]+"))
+ 
+ 
+ 
+Sys.sleep(31)
+
+print(full1 %>%filter(stake==x)  %>% ggplot()+geom_bar(aes(reorder(name,total),total,fill=ifelse(total>0,"blue","red")),stat="identity",position = "dodge")+geom_hline(yintercept=0)+theme(axis.text.x=element_text(angle = 0,size=8))+geom_hline(yintercept = 0)+labs(title=paste(x,"@",dd,"股價: ",myprice[1],"漲跌幅: ",myprice[3]),y="",x="") +theme(legend.position = "none")+coord_flip()) }
+
+ 
+
+```
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------
+
+
+### 2021/7/6累計至今
+
+```{r ,echo=F,warning=F,message=F,error=F,fig.width=10,fig.height=12}
+
+library(kableExtra)
+ 
+
+
+aa %>% group_by(stake) %>% summarise(t=sum(total)) %>% kable(caption=paste0(min(as.character(aa$date)),"~",max(as.character(aa$date)))) %>%
+  kable_classic( html_font = "Cambria",c("striped", "hover","condensed"),full_width=F,font_size=20) %>%
+  column_spec(1:2,width="3.5cm")
+
+ 
+ 
+
+
+
+```
+
+
+
+----------------------------------------------------------------
+
+---------------------------------------------------------------- 
+
+
+
+### 累計買賣分析
+
+
+```{r ,echo=F,warning=F,message=F,error=F,fig.width=10,fig.height=12}
+
+
+
+
+
+
+
+
+
+aa2=rbind(aa%>% group_by(stake,date)%>%top_n(5,desc(total)),aa%>% group_by(stake,date)%>%top_n(5,total)) 
+
+aa2=aa2 %>% arrange(stake,as.character(date))
+
+j=unique(aa2$stake)
+
+#aa2=aa2 %>% filter(total>25)
+
+for (x in j) {
+print(aa2 %>% filter(stake==x,total>20) %>% ggplot(aes(as.character(date),total))+geom_bar(aes(fill=ifelse(total>0,"blue","red")),stat="identity",position="dodge")+geom_hline(yintercept=0)+labs(title=x,x="",y="") +theme(axis.text.x = element_text(angle=90,size = 6),legend.position = "none")+facet_wrap(name~.,ncol=7))
+}
+
+```
+
+
+
+----------------------------------------------------------------
+
+---------------------------------------------------------------- 
+
+
+
+### 累計主力買賣分析
+
+
+```{r ,echo=F,warning=F,message=F,error=F,fig.width=10,fig.height=9}
+
+
+
+ 
+
+
+ 
+
+# 
+# 
+# j=unique(aa2$stake)
+# 
+# 
+# 
+# for (x in j){
+#   
+#   print(aa2 %>% filter(total>1 | total<(-1))%>%filter(stake==x) %>%  arrange(total) %>% ggplot()+geom_bar(aes(date,total,fill=ifelse(total>0,"blue","red")),stat="identity")+theme(axis.text.x=element_text(angle = 0,size=8))+geom_hline(yintercept = 0)+facet_wrap(name~.,ncol=5)+labs(title=x) +theme(legend.position = "none"))
+# }
+
+
+ 
+
+
+
+aa3=aa2 %>% group_by(stake,name) %>% summarise(t=sum(total))
+
+myfilter=as.integer(Sys.Date()-as.Date("2021-08-01"))*10
+
+aa3=aa3 %>% filter(abs(t)>60)
+
+start_d=min(as.character(aa2$date))
+end_d=max(as.character(aa2$date))
+
+j=unique(aa3$stake) 
+
+for (x in j){
+
+print(aa3 %>%filter(stake==x)  %>% ggplot()+geom_bar(aes(reorder(name,t),t,fill=ifelse(t>0,"blue","red")),stat="identity",position = "dodge")+geom_hline(yintercept=0)+theme(axis.text.x=element_text(angle = 0,size=8))+geom_hline(yintercept = 0) +theme(legend.position = "none")+coord_flip()+labs(title=paste(x,"@",start_d,"~",end_d),y="",x="")) }
+
+
+
+
+
+```
+
+
+
+
+
+
+----------------------------------------------------------------
+
+---------------------------------------------------------------- 
+
+
+
+### 大盤分析
+
+
+```{r ,echo=F,warning=F,message=F,error=F,fig.width=10,fig.height=9,eval=F}
+
+url="https://goodinfo.tw/StockInfo/StockIdxDetail.asp?STOCK_ID=%E5%8A%A0%E6%AC%8A%E6%8C%87%E6%95%B8"
+
+library(rvest)
+
+myint=NULL
+p=url %>% read_html()
+
+page=p %>% html_nodes("table") %>% html_text()
+length(page)
+
+for (i in 1:58){
+  print(paste(i,nchar(page[i])))
+}
+ 
+page[47]
+
+x=page[48]
+library(stringr)
+x1=str_split(x," ")
+
+x2=x1[[1]]
+
+x3=x2[x2!=""]
+
+id=x3[seq(1,length(x3),4)]
+name=x3[seq(2,length(x3),4)]
+date=x3[seq(3,length(x3),4)]
+type=x3[seq(4,length(x3),4)]
+
+ 
+str_extract_all(id,"[0-9]{4}")
+id1=unlist(str_extract_all(id,"[0-9.]+"))
+index=id1[seq(1,408,2)]
+
+int=as.numeric(id1[seq(2,408,2)])
+
+ 
+date=as.character.Date(date,format="%Y/%m/%d")
+ 
+myint=data.frame(index,name,int,date)
+
+myint$price=0
+
+ 
+
+for (i in 1:43){
+
+url2=paste0("https://goodinfo.tw/StockInfo/StockDetail.asp?STOCK_ID=",myint$index[i])
+
+p=url2 %>% read_html()
+
+page=p %>% html_nodes("table") %>% html_text()
+
+myint$price[i]=as.numeric(str_extract(str_sub(page[13],49),"[0-9.]+"))
+Sys.sleep(sample(11:31,1))
+}
+
+
+library(readr) 
+
+
+
+library(tidyverse)
+
+
+
+f %>% filter(iwant>10) %>% arrange(desc(iwant))
+
+x=read.csv("~/Downloads/abc.csv")
+
+
+library(ggplot2)
+for (i in 1:nrow(x)){print(ggplot(x[i,])+geom_line(aes(seq_along(x[i,6:18]),as.numeric(x[i,6:18]))))}
+
+ggplot(x)+geom_line(aes(1:20,x[1,6:25]))
+
+xx=t(x[,c(2,6:18)])
+
+yy=data.frame(xx)
+names(yy)=yy[1,]
+yy=yy[-1,]
+
+
+
+for (i in 1:25){
+print(ggplot(yy)+geom_line(aes(1:13,as.numeric(yy[,i])))+labs(title=names(yy)[i]))}
+
+
+```

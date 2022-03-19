@@ -1,0 +1,1187 @@
+---
+title: "今彩539分析"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+ 
+
+```{r ,echo=F,warning=F,message=F }
+
+
+setwd("~/mygit/lot")
+
+library(tidyr)
+
+# library(XML)
+
+library(rvest)
+bingo=0
+mm=0
+ 
+ 
+ # https://www.pilio.idv.tw/lto539/ServerB/list.asp?indexpage=1&orderby=new
+
+c=NULL
+for (i in 1:184){
+url=paste("https://www.pilio.idv.tw/lto539/ServerB/list.asp?indexpage=",i,"&orderby=new",sep="")
+xx=url %>% read_html()%>% html_nodes("table.auto-style1")%>% html_nodes("tr")%>% html_nodes("td") %>%html_text()
+library(stringr)
+n=length(xx)
+
+
+ 
+mydate=xx[seq(3,n,2)]
+myn=xx[seq(4,n,2)]%>%str_trim("both") 
+b=data.frame(mydate,myn)
+c=rbind(c,b)}
+ 
+ 
+ 
+library(tidyr)
+ 
+c1=c %>% separate(myn,c("v1","v2","v3","v4","v5"))
+ 
+
+ 
+
+library(stringr)
+ 
+ 
+c1$mydate=as.Date(c$mydate,"%Y/%m/%d")
+ 
+ 
+ 
+ 
+
+c11=c1[order(c1$mydate),]
+ 
+write.csv(c11,"lot539.csv",row.names=F)
+ 
+ 
+mxx=read.csv("lot539.csv") 
+ 
+ 
+```
+ 
+ 
+ 
+ 
+ 
+### 單用以本期開獎獎號下期最常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 39,nrow=39)
+
+n=nrow(mxx)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]=  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:5){
+ tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+ #  lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+# tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),3))$ix [2]
+
+ guess=c(tmp,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>3500){cat("\n");print("-----------");cat("\n");cat("預測號碼：\n");print(guess);cat("開獎結果： \n");print((mxx[i+1,]));print(paste("第",i ,"次猜測結果中： ", sum(guess %in% as.integer(mxx[i+1,2:6]))));  result11=c(result11,sum(guess %in% as.integer(mxx[i+1,2:6]))); print(table(result11));cat("\n")}
+  
+
+ 
+ 
+  
+}
+
+
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:5){
+ tmp=which.max(as.integer(nextday[as.integer(mxx[n,2:6])[j],]))
+ guess=c(tmp,guess)}
+guess=unique(guess)
+#print(nextday)
+print("本期開獎：")  
+print(mxx[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+
+```
+
+
+
+ 
+ 
+### 單用以本期開獎獎號下期最不常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 39,nrow=39)
+
+n=nrow(mxx)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]=  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:5){
+  
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),39))$ix [39]
+
+ guess=c(tmp,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>3500){cat("\n");print("-----------");cat("\n");cat("預測號碼：\n");print(guess);cat("開獎結果： \n");print((mxx[i+1,]));print(paste("第",i ,"次猜測結果中： ", sum(guess %in% as.integer(mxx[i+1,2:6]))));  result11=c(result11,sum(guess %in% as.integer(mxx[i+1,2:6]))); print(table(result11));cat("\n")}
+  
+
+ 
+ 
+  
+}
+
+
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:5){
+lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),39))$ix [39]
+ guess=c(tmp,guess)
+  guess=unique(guess)
+ }
+
+#print(nextday)
+print("本期開獎：")  
+print(mxx[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+
+```
+
+
+
+### 單用以本期開獎獎號下期第2常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 39,nrow=39)
+
+n=nrow(mxx)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]=  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:5){
+  
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),2))$ix [2]
+
+ guess=c(tmp,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>3500){cat("\n");print("-----------");cat("\n");cat("預測號碼：\n");print(guess);cat("開獎結果： \n");print((mxx[i+1,]));print(paste("第",i ,"次猜測結果中： ", sum(guess %in% as.integer(mxx[i+1,2:6]))));  result11=c(result11,sum(guess %in% as.integer(mxx[i+1,2:6]))); print(table(result11));cat("\n")}
+  
+
+ 
+ 
+  
+}
+
+
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:5){
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),2))$ix [2]
+ guess=c(tmp,guess)}
+guess=unique(guess)
+#print(nextday)
+print("本期開獎：")  
+print(mxx[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+
+```
+
+
+
+
+
+### 單用以本期開獎獎號下期第1+2常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 39,nrow=39)
+
+n=nrow(mxx)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]=  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:5){
+  tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),2))$ix [2]
+
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>3500){cat("\n");print("-----------");cat("\n");cat("預測號碼：\n");print(guess);cat("開獎結果： \n");print((mxx[i+1,]));print(paste("第",i ,"次猜測結果中： ", sum(guess %in% as.integer(mxx[i+1,2:6]))));  result11=c(result11,sum(guess %in% as.integer(mxx[i+1,2:6]))); print(table(result11));cat("\n")}
+  
+
+}
+
+
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:5){
+tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),2))$ix [2]
+
+guess=c(tmp,tmp2,guess)}
+ 
+#print(nextday)
+print("本期開獎：")  
+print(mxx[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+
+print(guess)
+
+
+```
+
+
+
+
+
+
+### 單用以本期開獎獎號下期第1+39常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 39,nrow=39)
+
+n=nrow(mxx)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]=  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:5){
+  tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),39))$ix [39]
+
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>3500){cat("\n");print("-----------");cat("\n");cat("預測號碼：\n");print(guess);cat("開獎結果： \n");print((mxx[i+1,]));print(paste("第",i ,"次猜測結果中： ", sum(guess %in% as.integer(mxx[i+1,2:6]))));  result11=c(result11,sum(guess %in% as.integer(mxx[i+1,2:6]))); print(table(result11));cat("\n")}
+  
+
+ 
+ 
+  
+}
+
+
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:5){
+tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),39))$ix [39]
+
+ guess=c(tmp,tmp2,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(mxx[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+
+```
+
+
+
+
+### 單用以本期開獎獎號下期第1+3常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 39,nrow=39)
+
+n=nrow(mxx)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]=  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:5){
+  tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),3))$ix [3]
+
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>3000){  result11=c(result11,sum(guess %in% as.integer(mxx[i+1,2:6])))
+ }
+
+ 
+ 
+  
+}
+
+ print(table(result11)) 
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:5){
+tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),39))$ix [39]
+
+ guess=c(tmp,tmp2,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(mxx[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+
+```
+
+
+### 單用以本期開獎獎號下期第1+4常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 39,nrow=39)
+
+n=nrow(mxx)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]=  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:5){
+  tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),4))$ix [4]
+
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>3000){  result11=c(result11,sum(guess %in% as.integer(mxx[i+1,2:6])))
+ }
+
+ 
+ 
+  
+}
+
+ print(table(result11)) 
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:5){
+tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),4))$ix [4]
+
+ guess=c(tmp,tmp2,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(mxx[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+
+```
+
+
+
+### 單用以本期開獎獎號下期第1+5常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 39,nrow=39)
+
+n=nrow(mxx)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]=  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:5){
+  tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),5))$ix [5]
+
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>3000){  result11=c(result11,sum(guess %in% as.integer(mxx[i+1,2:6])))
+ }
+
+ 
+ 
+  
+}
+
+ print(table(result11)) 
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:5){
+tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),5))$ix [5]
+
+ guess=c(tmp,tmp2,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(mxx[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+
+```
+
+
+
+
+
+### 單用以本期開獎獎號下期第1+2常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+pick=2
+result11=NULL
+ 
+nextday=matrix(0,ncol = 39,nrow=39)
+
+n=nrow(mxx)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]=  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:5){
+  tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick))$ix [pick]
+
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>3000){  result11=c(result11,sum(guess %in% as.integer(mxx[i+1,2:6])))
+ }
+
+ 
+ 
+  
+}
+
+ print(table(result11)) 
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:5){
+tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick))$ix [pick]
+
+ guess=c(tmp,tmp2,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(mxx[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+
+```
+
+
+
+
+
+### 單用以本期開獎獎號下期第1+10常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+pick=10
+result11=NULL
+ 
+nextday=matrix(0,ncol = 39,nrow=39)
+
+n=nrow(mxx)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]=  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:5){
+  tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick))$ix [pick]
+
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>3000){  result11=c(result11,sum(guess %in% as.integer(mxx[i+1,2:6])))
+ }
+
+ 
+ 
+  
+}
+
+ print(table(result11)) 
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:5){
+tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick))$ix [pick]
+
+ guess=c(tmp,tmp2,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(mxx[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+
+```
+
+
+
+### 單用以本期開獎獎號下期第1+20常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+pick=20
+result11=NULL
+ 
+nextday=matrix(0,ncol = 39,nrow=39)
+
+n=nrow(mxx)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]=  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:5){
+  tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick))$ix [pick]
+
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>3000){  result11=c(result11,sum(guess %in% as.integer(mxx[i+1,2:6])))
+ }
+
+ 
+ 
+  
+}
+
+ print(table(result11)) 
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:5){
+tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick))$ix [pick]
+
+ guess=c(tmp,tmp2,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(mxx[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+
+```
+
+
+
+
+
+
+### 單用以本期開獎獎號下期第1+30常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+pick=30
+result11=NULL
+ 
+nextday=matrix(0,ncol = 39,nrow=39)
+
+n=nrow(mxx)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]=  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:5){
+  tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick))$ix [pick]
+
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>3000){  result11=c(result11,sum(guess %in% as.integer(mxx[i+1,2:6])))
+ }
+
+ 
+ 
+  
+}
+
+ print(table(result11)) 
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:5){
+tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick))$ix [pick]
+
+ guess=c(tmp,tmp2,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(mxx[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+
+```
+
+
+
+
+### 單用以本期開獎獎號下期第2+3常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+pick1=2
+pick2=3
+result11=NULL
+ 
+nextday=matrix(0,ncol = 39,nrow=39)
+
+n=nrow(mxx)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]=  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:5){
+   
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick1))$ix [pick1]   
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick2))$ix [pick2]
+
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>3000){  result11=c(result11,sum(guess %in% as.integer(mxx[i+1,2:6])))
+ }
+
+ 
+ 
+  
+}
+
+ print(table(result11)) 
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:5){
+#tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick1))$ix [pick1]   
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick2))$ix [pick2]
+
+ guess=c(tmp,tmp2,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(mxx[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+
+```
+
+
+
+### 單用以本期開獎獎號下期第2+4常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+pick1=2
+pick2=4
+result11=NULL
+ 
+nextday=matrix(0,ncol = 39,nrow=39)
+
+n=nrow(mxx)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]=  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:5){
+   
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick1))$ix [pick1]   
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick2))$ix [pick2]
+
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>3000){  result11=c(result11,sum(guess %in% as.integer(mxx[i+1,2:6])))
+ }
+
+ 
+ 
+  
+}
+
+ print(table(result11)) 
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:5){
+#tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick1))$ix [pick1]   
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick2))$ix [pick2]
+
+ guess=c(tmp,tmp2,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(mxx[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+
+```
+
+
+
+
+### 單用以本期開獎獎號下期第2+5常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+pick1=2
+pick2=5
+result11=NULL
+ 
+nextday=matrix(0,ncol = 39,nrow=39)
+
+n=nrow(mxx)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]=  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:5){
+   
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick1))$ix [pick1]   
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick2))$ix [pick2]
+
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>3000){  result11=c(result11,sum(guess %in% as.integer(mxx[i+1,2:6]))) 
+ }
+
+ 
+ 
+  
+}
+
+ print(table(result11)) 
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:5){
+#tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick1))$ix [pick1]   
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick2))$ix [pick2]
+
+ guess=c(tmp,tmp2,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(mxx[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+
+```
+
+
+
+
+### 單用以本期開獎獎號下期第3+4常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+pick1=3
+pick2=4
+result11=NULL
+ 
+nextday=matrix(0,ncol = 39,nrow=39)
+
+n=nrow(mxx)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]=  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:5){
+   
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick1))$ix [pick1]   
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick2))$ix [pick2]
+
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>3000){  result11=c(result11,sum(guess %in% as.integer(mxx[i+1,2:6])));  
+ }
+
+
+ 
+  
+}
+
+
+  print(table(result11))
+
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:5){
+#tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick1))$ix [pick1]   
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),pick2))$ix [pick2]
+
+ guess=c(tmp,tmp2,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(mxx[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+
+```
+
+
+
+
+
+
+隨機猜測
+
+```{r ,echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5,eval=F}
+
+
+ 
+result1=NULL
+for (i in 3001:4232){
+guess=sample(1:39,10)
+
+tmp1= sum(guess %in% as.integer(mxx[i,2:6]))
+
+result1=c(tmp1,result1)
+print(table(result1))
+print(round(table(result1)/sum(table(result1)),5)*100)
+}
+
+
+ 
+
+```
+

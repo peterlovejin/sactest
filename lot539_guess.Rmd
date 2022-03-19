@@ -1,0 +1,196 @@
+---
+title: "今彩539預測"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+ 
+ 
+Time: `r Sys.time()`
+ 
+ ----------------------------------------------
+ 
+ 
+
+```{r ,echo=F,warning=F,message=F }
+
+
+setwd("~/mygit/peterlovejin.github.io/")
+
+library(tidyr)
+
+# library(XML)
+
+library(rvest)
+bingo=0
+mm=0
+ 
+ 
+ # https://www.pilio.idv.tw/lto539/ServerB/list.asp?indexpage=1&orderby=new
+
+c=NULL
+for (i in 1:184){
+url=paste("https://www.pilio.idv.tw/lto539/ServerB/list.asp?indexpage=",i,"&orderby=new",sep="")
+xx=url %>% read_html()%>% html_nodes("table.auto-style1")%>% html_nodes("tr")%>% html_nodes("td") %>%html_text()
+library(stringr)
+n=length(xx)
+ 
+
+
+ 
+mydate=xx[seq(3,n,2)]
+myn=xx[seq(4,n,2)]%>%str_trim("both") 
+b=data.frame(mydate,myn)
+c=rbind(c,b)}
+ 
+ 
+ 
+library(tidyr)
+ 
+c1=c %>% separate(myn,c("v1","v2","v3","v4","v5"))
+ 
+
+ 
+
+library(stringr)
+ 
+ 
+c1$mydate=as.Date(c$mydate,"%Y/%m/%d")
+ 
+ 
+ 
+ 
+
+c11=c1[order(c1$mydate),]
+ 
+write.csv(c11,"lot539.csv",row.names=F)
+ 
+ 
+mxx=read.csv("lot539.csv") 
+
+
+ 
+```
+ 
+  
+ 
+
+### 單用以本期開獎獎號下期第1+2常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 39,nrow=39)
+
+n=nrow(mxx)
+
+ 
+ 
+for (i in 2:n){
+   
+   nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]=  nextday[as.integer(mxx[i-1,2:6]),as.integer(mxx[i,2:6])]+1
+   
+   
+  
+ if (i>232){ 
+  guess=NULL
+  for (j in 1:5){
+#   tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+# tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),2))$ix [2]
+tmp3=lapply(lst, `[`, lst$x %in% head(lst$x,39))$ix [c(1,2,39)]
+
+
+ guess=c(tmp3,guess)
+
+  }
+  
+
+ guess=sample(guess,5)
+
+  
+  result11=c(result11,sum(guess %in% as.integer(mxx[i+1,2:6])))}
+ 
+ }
+  
+
+ 
+
+
+ print(table(result11)) 
+ 
+  print(prop.table(table(result11)))
+ 
+ print(paste("最新一期猜測結果：",tail(result11,2)[1]))
+
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:5){
+#tmp=which.max(as.integer(nextday[as.integer(mxx[i,2:6])[j],]))
+   lst <- sort(as.integer(nextday[as.integer(mxx[i,2:6])[j],]), index.return=TRUE, decreasing=TRUE)
+   
+tmp2=lapply(lst, `[`, lst$x %in% head(lst$x,39))$ix [c(1,2,39)]
+
+guess=c(tmp2,guess)
+
+
+}
+
+guess=unique(guess)
+ 
+
+#print(nextday)
+print("本期開獎：")  
+print(mxx[n,])
+
+ 
+
+print("下期預測：")   
+cat("\n")
+
+print(guess)
+
+guess=sample(guess,5)
+
+print(guess)
+
+
+```
+
+
+ 
+result=NULL
+
+for (i in 1:4232){
+
+x=sample(1:39,5)
+
+tmp=sum(x %in% unlist(mxx[i,2:6]))
+
+result=c(tmp,result)
+
+}
+table(result)
+
+
+
+
+
+result=NULL
+
+for (i in 1:4232){
+
+x=c(1,11,25,29,4)
+
+tmp=sum(x %in% unlist(mxx[i,2:6]))
+
+result=c(tmp,result)
+
+}
+table(result)

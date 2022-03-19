@@ -1,0 +1,264 @@
+---
+title: "大樂透分析"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+ 
+
+Time: `r Sys.time()`
+
+------------------------------------
+
+
+```{r ,echo=F,warning=F,message=F }
+ 
+setwd("~/mygit/peterlovejin.github.io/")
+
+ #install.packages("rvest")
+ library(stringr)
+library(ggplot2)
+library(knitr)
+ 
+library(tidyr)
+ 
+library(rvest)
+library(dplyr)
+#library(XML)
+#library(xml2)
+
+ 
+
+ # https://www.pilio.idv.tw/ltobig/ServerJ/list.asp?indexpage=81&orderby=new
+ 
+ 
+ 
+b=NULL
+c=NULL
+for (i in 1:83){
+url=paste("https://www.pilio.idv.tw/ltobig/ServerJ/list.asp?indexpage=",i,"&orderby=new",sep="")
+
+xx=NULL 
+
+xx=url %>% read_html()%>% html_nodes("table.auto-style1")%>% html_nodes("tr")%>% html_nodes("td") %>%html_text()
+library(stringr)
+n=length(xx)
+
+mydate=xx[seq(4,n,3)]
+myn=xx[seq(5,n,3)]%>%str_trim("both")  
+mys=xx[seq(6,n,3)]%>%str_trim("both")
+b=data.frame(mydate,myn,mys)
+
+c=rbind(c,b)}
+
+
+
+
+ 
+
+c1=c %>% separate(myn,c("v1","v2","v3","v4","v5","v6"))
+ 
+
+ 
+ 
+
+
+
+#c1$開獎日期=as.character(c1$開獎日期)
+ 
+#c1$開獎日期=as.Date(c$mydate,"%Y%m/%d")
+ 
+#c1$第二區=as.character(c1$第二區)
+# 
+  
+
+#c11=c1[order(c1$開獎日期),]
+
+ 
+ 
+write.csv(c1,"biglot.csv",row.names=FALSE)
+
+ 
+ 
+xx=c1
+
+ 
+ 
+#for (i in 2:8) c11[,i]=as.integer(c11[,i])
+ 
+ xx=unique(xx)
+ 
+ 
+ 
+ 
+ 
+ 
+
+xx1=xx[order(as.Date(xx[,1])),]
+ 
+
+ 
+
+ 
+```
+
+
+### 單用以本期開獎獎號下期最常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+ tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>1600){  result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8])))}
+  
+
+ 
+ 
+  
+}
+
+  print(table(result11)) 
+  
+  print(paste("最新一期猜測結果：", tail(result11,2)[1]))
+  
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:7){
+ tmp=which.max(as.integer(nextday[as.integer(xx1[n,2:8])[j],]))
+ guess=c(tmp,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(xx1[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+ 
+
+ 
+
+ 
+  
+ 
+
+
+
+ 
+
+ 
+
+```
+
+
+
+ 
+
+
+### 單用以本期開獎獎號下期1+2常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+  lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+ # tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),2))$ix [1]
+ tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),2))$ix [2]
+ 
+tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,tmp2,guess)
+
+ }
+   guess=unique(guess)
+   if (i>1600){ result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8])))}
+  
+ 
+ 
+ 
+  
+}
+
+
+ 
+ print(table(result11))
+ print(round(table(result11)/sum(table(result11)),5)*100) 
+ 
+ print(paste("最新一期猜測結果：", tail(result11,2)[1]))
+
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:7){
+     lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),2))$ix [2]
+ tmp=which.max(as.integer(nextday[as.integer(xx1[n,2:8])[j],]))
+ guess=c(tmp,tmp2,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(xx1[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+ 
+ 
+  
+ 
+ 
+
+
+
+
+```
+
+ 

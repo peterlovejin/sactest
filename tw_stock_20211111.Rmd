@@ -1,0 +1,73 @@
+---
+title: "tw_stock_20211008"
+author: "Peter Lin"
+date: "11/11/2021"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+
+### 上市公司
+
+#### 2021/11/10 收盤價介於20~30元 股票
+
+```{r ,echo=F,warning=F,message=F ,error=F,fig.width=11,fig.height=7}
+ 
+library(readxl)
+id1=read_xlsx("/home/peter/myr/id.xlsx",1)
+id2=read_xlsx("/home/peter/myr/id.xlsx",2)
+library(quantmod)
+n=nrow(id2)
+ 
+ 
+
+for (i in 1:n){
+  
+  if (i==220) next else {
+  x=getSymbols(paste0(id2[i,3],".TW"),from="2021-02-01",to=Sys.Date(),auto.assign=F)
+
+ 
+
+ library(dygraphs)
+ 
+  x=na.omit(x)
+ 
+  if (tail(x,1)[,4]>20 & tail(x,1)[,4]<30)
+  {   (dygraph(x[,3],main=paste(id2[i,3],id2[i,4]))%>% dyRangeSelector());chartSeries(x,theme="white",name=paste(id2[i,3],id2[i,4]),TA=c(addRSI(),addMACD(),addBBands(),addVo()))}
+
+  
+  }
+  
+    if (i %in% c(2606.2609,2603))
+  {   (dygraph(x[,3],main=paste(id2[i,3],id2[i,4]))%>% dyRangeSelector());chartSeries(x,theme="white",name=paste(id2[i,3],id2[i,4]),TA=c(addRSI(),addMACD(),addBBands(),addVo()))}
+
+  
+  
+  }
+
+```
+
+
+### 上櫃公司
+
+#### 2021/11/10 收盤價介於20~30元 股票
+
+```{r ,echo=F,warning=F,message=F ,error=F,fig.width=11,fig.height=7}
+ library(readxl)
+ 
+n=nrow(id1)
+
+ 
+
+for (i in 1:n){
+  x=getSymbols(paste0(id1[i,3],".TWO"),from="2021-02-01",to=Sys.Date(),auto.assign=F)
+  
+   x=na.omit(x)
+  if ( tail(x,1)[,4]>20 & tail(x,1)[,4]<30)
+  {(dygraph(x[,3],main=paste(id1[i,3],id1[i,4])));chartSeries(x,theme="white",TA=c(addRSI(),addMACD(),addBBands(),addVo()),name=paste(id1[i,3],id1[i,4]))}
+
+  
+}
+
+```

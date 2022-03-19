@@ -1,0 +1,1051 @@
+---
+title: "大樂透分析"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+ 
+
+```{r ,echo=F,warning=F,message=F }
+ 
+setwd("~/mygit/peterlovejin.github.io/")
+
+ #install.packages("XML")
+ library(stringr)
+library(ggplot2)
+library(knitr)
+ 
+library(tidyr)
+ 
+library(rvest)
+library(dplyr)
+#library(XML)
+#library(xml2)
+
+bingo=0
+mm=0
+
+ 
+ 
+#url="https://www.pilio.idv.tw/ltobig/list.asp?indexpage=1&orderby=new"
+ 
+
+
+
+
+c=NULL
+for (i in 1:83){
+url=paste("https://www.pilio.idv.tw/ltobig/list.asp?indexpage=",i,"&orderby=new",sep="")
+
+ 
+
+xx=url %>% read_html()%>% html_nodes("table.auto-style1")%>% html_nodes("tr")%>% html_nodes("td") %>%html_text()
+library(stringr)
+n=length(xx)
+
+ mydate=xx[seq(4,n,3)]
+myn=xx[seq(5,n,3)]%>%str_trim("both")  
+mys=xx[seq(6,n,3)]%>%str_trim("both")
+b=data.frame(mydate,myn,mys)
+
+c=rbind(c,b)}
+
+
+
+
+ 
+
+c1=c %>% separate(myn,c("v1","v2","v3","v4","v5","v6"))
+ 
+
+ 
+ 
+
+
+
+#c1$開獎日期=as.character(c1$開獎日期)
+ 
+#c1$開獎日期=as.Date(c$mydate,"%Y%m/%d")
+ 
+#c1$第二區=as.character(c1$第二區)
+# 
+  
+
+#c11=c1[order(c1$開獎日期),]
+
+ 
+ 
+write.csv(c1,"biglot.csv",row.names=FALSE)
+
+ 
+ 
+xx=read.csv("biglot.csv") 
+
+ 
+ 
+#for (i in 2:8) c11[,i]=as.integer(c11[,i])
+ 
+ xx=unique(xx)
+ 
+ 
+ 
+ 
+ 
+ 
+
+xx1=xx[order(as.Date(xx[,1])),]
+data.frame(sort(table(unlist(tail(xx1,49*52)[,2:8]))))
+
+ 
+
+ 
+```
+
+
+### 單用以本期開獎獎號下期最常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+ tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>1600){cat("\n");print("-----------");cat("\n");cat("預測號碼：\n");print(guess);cat("開獎結果： \n");print(kable(xx1[i+1,]));print(paste("第",i ,"次猜測結果中： ", sum(guess %in% as.integer(xx1[i+1,2:8]))));  result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8]))); print(table(result11));cat("\n")}
+  
+
+ 
+ 
+  
+}
+
+
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:7){
+ tmp=which.max(as.integer(nextday[as.integer(xx1[n,2:8])[j],]))
+ guess=c(tmp,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(xx1[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+nextday[c(13,16,17,19,39,44,42),]
+
+ 
+
+ 
+  
+ 
+
+
+
+ 
+
+ 
+
+```
+
+
+
+
+
+### 單用以本期開獎獎號下期第二常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+  lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),3))$ix [2]
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>1600){cat("\n");print("-----------");cat("\n");cat("預測號碼：\n");print(guess);cat("開獎結果： \n");print((xx1[i+1,]));print(paste("第",i ,"次猜測結果中： ", sum(guess %in% as.integer(xx1[i+1,2:8]))));  result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8]))); print(table(result11));cat("\n")}
+  
+
+ 
+ 
+  
+}
+
+
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:7){
+ tmp=which.max(as.integer(nextday[as.integer(xx1[n,2:8])[j],]))
+ guess=c(tmp,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(xx1[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+nextday[c(13,16,17,19,39,44,42),]
+
+ 
+
+ 
+  
+ 
+ 
+
+
+
+
+```
+
+
+### 單用以本期開獎獎號下期1+2常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+  lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),2))$ix [2]
+ tmp2=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>1600){cat("\n");print("-----------");cat("\n");cat("預測號碼：\n");print(guess);cat("開獎結果： \n");print((xx1[i+1,]));print(paste("第",i ,"次猜測結果中： ", sum(guess %in% as.integer(xx1[i+1,2:8]))));  result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8]))); print(table(result11));print(round(table(result11)/sum(table(result11)),5)*100);cat("\n")}
+  
+
+ 
+ 
+  
+}
+
+
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:7){
+ tmp=which.max(as.integer(nextday[as.integer(xx1[n,2:8])[j],]))
+ guess=c(tmp,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(xx1[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+nextday[c(13,16,17,19,39,44,42),]
+
+ 
+
+ 
+  
+ 
+ 
+
+
+
+
+```
+
+
+### 單用以本期開獎獎號下期1+49常出現的號碼
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+  lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),49))$ix [49]
+ tmp2=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>1600){cat("\n");print("-----------");cat("\n");cat("預測號碼：\n");print(guess);cat("開獎結果： \n");print((xx1[i+1,]));print(paste("第",i ,"次猜測結果中： ", sum(guess %in% as.integer(xx1[i+1,2:8]))));  result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8]))); print(table(result11));print(round(table(result11)/sum(table(result11)),5)*100);cat("\n")}
+  
+
+ 
+ 
+  
+}
+
+
+cat("\n")
+cat("**********************************")   
+ 
+  
+ guess=NULL
+ 
+  for (j in 1:7){
+ tmp=which.max(as.integer(nextday[as.integer(xx1[n,2:8])[j],]))
+ guess=c(tmp,guess)}
+
+#print(nextday)
+print("本期開獎：")  
+print(xx1[n,])
+
+guess=unique(guess)
+
+print("下期預測：")   
+cat("\n")
+print(guess)
+
+nextday[c(13,16,17,19,39,44,42),]
+
+ 
+
+ 
+  
+ 
+ 
+
+
+
+
+```
+
+
+### 單用以本期開獎獎號下期最不常出現的號碼
+
+```{r ,echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5,eval=F}
+
+
+result=NULL
+together=matrix(0,ncol = 49,nrow=49)
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ as.integer(xx1[1,2:8])
+
+for (i in 1:(n-1)){
+  nextday[as.integer(xx1[i,2:8]),as.integer(xx1[i+1,2:8])]=  nextday[as.integer(xx1[i,2:8]),as.integer(xx1[i+1,2:8])]+1
+  
+  guess=NULL
+  
+  for (j in 1:7){
+ tmp=which.min(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,guess)}
+  
+  guess=unique(guess)
+  
+ if (sum(guess %in% as.integer(xx1[i+1,2:8]))>5){cat("\n");print("-----------");cat("\n");print(xx1[i+1,]);print(guess);print(paste("第",i ,"次猜測： ", sum(guess %in% as.integer(xx1[i+1,2:8]))))}
+  
+  result=c(result,sum(guess %in% as.integer(xx1[i+1,2:8])))
+  
+}
+
+  
+  
+(table(result))
+ 
+ 
+
+```
+
+
+
+
+
+隨機猜測
+
+```{r ,echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5,eval=F}
+
+
+result1=NULL
+for (i in 1001:1879){
+guess=sample(1:49,14)
+
+tmp1= sum(guess %in% as.integer(xx1[i,2:8]))
+
+result1=c(tmp1,result1)
+print(table(result1))
+print(round(table(result1)/sum(table(result1)),5)*100)
+}
+
+
+ 
+
+```
+
+
+
+### 同時出現
+
+```{r ,echo=F,warning=F,message=F,eval=F}
+
+
+result3=NULL
+together=matrix(0,ncol = 49,nrow=49)
+ 
+
+n=nrow(xx1)
+
+ (2:8)[!((2:8)%in% 3)]
+
+for (i in 1:(n)){
+  for (j in 2:8){
+    together[xx1[i,j],as.integer(xx1[i,2:8])[!((as.integer(xx1[i,2:8]))%in%xx1[i,j])]]=together[xx1[i,j],as.integer(xx1[i,2:8])[!((as.integer(xx1[i,2:8]))%in%xx1[i,j])]]+1
+    
+  }
+ 
+  
+  guess3=NULL
+  
+  for (j in 1:7){
+ tmp=which.max(as.integer(together[as.integer(xx1[i,2:8])[j],]))
+ guess3=c(tmp,guess3)}
+  
+  guess3=unique(guess3)
+  
+ if (sum(guess3 %in% as.integer(xx1[i,2:8]))>5){cat("\n");print("-----------");cat("\n");print(xx1[i,]);print(guess3);print(paste("第",i ,"次猜測： ", sum(guess3 %in% as.integer(xx1[i,2:8]))))}
+  
+  result3=c(result3,sum(guess3 %in% as.integer(xx1[i+1,2:8])))
+  
+}
+
+  
+  
+(table(result3))
+ 
+ guess3=NULL
+   for (j in 1:7){
+ tmp=which.max(as.integer(together[as.integer(xx1[n,2:8])[j],]))
+ guess3=c(tmp,guess3)}
+  
+  guess3=unique(guess3)
+  
+  print(paste("本期開獎："))
+  print(xx1[n,])
+  print(paste("下期預計猜測："))
+  print(paste(guess3))
+ 
+
+ 
+
+
+```
+ 
+
+
+### 組合1+2 
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+  lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),2))$ix [2]
+ tmp2=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>1600){  result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8]))) }
+  
+}
+
+print(table(result11))
+print(round(table(result11)/sum(table(result11)),5)*100)
+cat("\n")
+cat("**********************************")   
+ 
+
+```
+ 
+ 
+ 
+### 組合1+3
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+  lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),3))$ix [3]
+ tmp2=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>1600){  result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8]))) }
+  
+}
+
+print(table(result11))
+print(round(table(result11)/sum(table(result11)),5)*100)
+cat("\n")
+cat("**********************************")   
+ 
+
+```
+
+
+
+
+### 組合1+4 
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+  lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),4))$ix [4]
+ tmp2=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>1600){  result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8]))) }
+  
+}
+
+print(table(result11))
+print(round(table(result11)/sum(table(result11)),5)*100)
+cat("\n")
+cat("**********************************")   
+ 
+
+```
+
+
+
+
+### 組合1+5 
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+  lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),5))$ix [5]
+ tmp2=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>1600){  result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8]))) }
+  
+}
+
+print(table(result11))
+print(round(table(result11)/sum(table(result11)),5)*100)
+cat("\n")
+cat("**********************************")   
+ 
+
+```
+
+
+
+
+### 組合1+6
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+  lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),6))$ix [6]
+ tmp2=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>1600){  result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8]))) }
+  
+}
+
+print(table(result11))
+print(round(table(result11)/sum(table(result11)),5)*100)
+cat("\n")
+cat("**********************************")   
+ 
+
+```
+
+
+
+### 組合1+49 
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+  lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),49))$ix [49]
+ tmp2=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>1600){  result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8]))) }
+  
+}
+
+print(table(result11))
+print(round(table(result11)/sum(table(result11)),5)*100)
+cat("\n")
+cat("**********************************")   
+ 
+
+```
+
+
+
+### 組合1+48 
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+  lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),48))$ix [48]
+ tmp2=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>1600){  result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8]))) }
+  
+}
+
+print(table(result11))
+print(round(table(result11)/sum(table(result11)),5)*100)
+cat("\n")
+cat("**********************************")   
+ 
+
+```
+
+
+
+### 組合1+47 
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+  lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),47))$ix [47]
+ tmp2=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>1600){  result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8]))) }
+  
+}
+
+print(table(result11))
+print(round(table(result11)/sum(table(result11)),5)*100)
+cat("\n")
+cat("**********************************")   
+ 
+
+```
+
+
+
+### 組合1+46
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+  lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),46))$ix [46]
+ tmp2=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>1600){  result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8]))) }
+  
+}
+
+print(table(result11))
+print(round(table(result11)/sum(table(result11)),5)*100)
+cat("\n")
+cat("**********************************")   
+ 
+
+```
+
+
+### 組合1+2 
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+  lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),45))$ix [45]
+ tmp2=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>1600){  result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8]))) }
+  
+}
+
+print(table(result11))
+print(round(table(result11)/sum(table(result11)),5)*100)
+cat("\n")
+cat("**********************************")   
+ 
+
+```
+
+
+
+### 組合1+25 
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+  lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),25))$ix [25]
+ tmp2=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>1600){  result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8]))) }
+  
+}
+
+print(table(result11))
+print(round(table(result11)/sum(table(result11)),5)*100)
+cat("\n")
+cat("**********************************")   
+ 
+
+```
+
+
+
+### 組合15+35 
+
+```{r echo=F,warning=F,message=F,error=F,fig.width=9,fig.height=5}
+
+
+result11=NULL
+ 
+nextday=matrix(0,ncol = 49,nrow=49)
+
+n=nrow(xx1)
+
+ 
+ 
+for (i in 1:n){
+  
+  if(i>=2){
+  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]=  nextday[as.integer(xx1[i-1,2:8]),as.integer(xx1[i,2:8])]+1
+  
+  }
+  
+  guess=NULL
+  for (j in 1:7){
+  lst <- sort(as.integer(nextday[as.integer(xx1[i,2:8])[j],]), index.return=TRUE, decreasing=TRUE)
+tmp=lapply(lst, `[`, lst$x %in% head(unique(lst$x),15))$ix [15]
+ tmp2=lapply(lst, `[`, lst$x %in% head(unique(lst$x),35))$ix [35]
+ #tmp=which.max(as.integer(nextday[as.integer(xx1[i,2:8])[j],]))
+ guess=c(tmp,tmp2,guess)
+ guess=unique(guess)
+ }
+  
+   if (i>1600){  result11=c(result11,sum(guess %in% as.integer(xx1[i+1,2:8]))) }
+  
+}
+
+print(table(result11))
+print(round(table(result11)/sum(table(result11)),5)*100)
+cat("\n")
+cat("**********************************")   
+ 
+
+```
